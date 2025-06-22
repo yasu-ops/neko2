@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フラッシュカードアプリ</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            min-height: 400px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .problem-set-list {
+            margin-bottom: 20px;
+        }
+        
+        .problem-set-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        
+        .problem-set-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .problem-set-info {
+            flex-grow: 1;
+        }
+        
+        .problem-set-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .problem-set-details {
+            color: #718096;
+            font-size: 0.9em;
+        }
+        
+        .study-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .study-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .question-area {
+            text-align: left;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+              /* 追加ポイント */
+            align-items: center;       /* 中央揃えを安定させる */
+            max-width: 600px;          /* 必要に応じて調整可 */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .question-content {
+            font-size: 1.3em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+        
+        .question-image, .answer-image {
+            /*max-width: 100%;*/
+            max-height: 700px;
+            height:auto;
+            width: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .action-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+        
+        .primary-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        
+        .secondary-button {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+        
+        .danger-button {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+        }
+        
+        .neutral-button {
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+            color: white;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .message {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .message-row {
+            display: flex;
+            align-items: center;
+            justify-content: right;
+            gap: 20px; /* ボタンとメッセージの間隔 */
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* スマホ対応：必要なら折り返し */
+        }
+
+        .message-row .message {
+            font-weight: bold;
+            font-size: 1.2em;
+            white-space: nowrap;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+        }
+        
+        .error {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .progress {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="app-content">
+            <div class="loading">問題セットリストを読み込み中...</div>
+        </div>
+    </div>
+
+    <script>
+        // グローバル変数
+        let problemSets = [];
+        let currentProblemSet = [];
+        let questionNumbers = [];
+        let wrongAnswerNumbers = [];
+        let currentQuestionNumber = 0;
+        let currentQuestionIndex = 0;
+        let totalQuestions = 0;
+        let currentSetNumber = 0;
+        let currentSetTitle = '';
+
+        // アプリケーション開始
+        window.onload = function() {
+            loadProblemSetList();
+        };
+
+        // CSVファイルを読み込む関数
+        async function loadCSV(filename) {
+            try {
+                const response = await fetch(filename);
+                if (!response.ok) {
+                    throw new Error(`ファイルが見つかりません: ${filename}`);
+                }
+                const text = await response.text();
+                return parseCSV(text);
+            } catch (error) {
+                console.error('CSV読み込みエラー:', error);
+                throw error;
+            }
+        }
+
+        // CSV解析関数
+        function parseCSV(text) {
+            const lines = text.split('\n').filter(line => line.trim());
+            return lines.map(line => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result;
+            });
+        }
+
+        // 問題セットリスト読み込み
+        async function loadProblemSetList() {
+            try {
+                const data = await loadCSV('flashcard01/question_set_list.csv');
+                problemSets = [];
+                
+                for (const row of data) {
+                    if (row.length >= 4) {
+                        const setNumber = row[0];
+                        const title = row[1];
+                        const path = row[2];
+                        const questionCount = parseInt(row[3]);
+                        
+                        // ローカルストレージからanki_statusを取得
+                        const progressKey = `anki_status${setNumber}`;
+                        const progress = localStorage.getItem(progressKey) || '未着手';
+                        
+                        problemSets.push([setNumber, title, path, questionCount, progress]);
+                    }
+                }
+                
+                displayProblemSetList();
+            } catch (error) {
+                document.getElementById('app-content').innerHTML = 
+                    `<div class="error">問題セットリスト.csvの読み込みに失敗しました: ${error.message}</div>`;
+            }
+        }
+
+        // 問題セットリスト表示
+        function displayProblemSetList() {
+            let html = '<div class="problem-set-list">';
+            
+            problemSets.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+            
+            for (const set of problemSets) {
+                const [setNumber, title, path, questionCount, progress] = set;
+                html += `
+                    <div class="problem-set-item">
+                        <div class="problem-set-info">
+                            <div class="problem-set-title">${setNumber}. ${title}</div>
+                            <div class="problem-set-details">問題数: ${questionCount}問 | 状況: ${progress}</div>
+                        </div>
+                        <button class="study-button" onclick="startStudy(${setNumber})">学習開始</button>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            document.getElementById('app-content').innerHTML = html;
+        }
+
+        // 学習開始
+        async function startStudy(setNumber) {
+            currentSetNumber = setNumber;
+            const set = problemSets.find(s => parseInt(s[0]) === setNumber);
+            if (!set) return;
+
+            const [, title, path, questionCount, progress] = set;
+            currentSetTitle = title;
+            
+            try {
+                // 問題セットCSV読み込み
+                const problemData = await loadCSV(path);
+                currentProblemSet = problemData;
+                totalQuestions = parseInt(questionCount);
+                wrongAnswerNumbers = [];
+
+                // 問題番号配列作成
+                if (progress === '未着手' || progress === '暗記済') {
+                    questionNumbers = Array.from({length: totalQuestions}, (_, i) => i + 1);
+                    startQuestions();
+                } else {
+                    showUnmemorizedChoiceDialog(progress);
+                }
+            } catch (error) {
+                document.getElementById('app-content').innerHTML = 
+                    `<div class="error">問題セット${path}の読み込みに失敗しました: ${error.message}</div>`;
+            }
+        }
+
+        // 未暗記項目選択ダイアログ
+        function showUnmemorizedChoiceDialog(progress) {
+            const html = `
+                <div class="message">未暗記のものだけやりますか？</div>
+                <div class="button-group">
+                    <button class="action-button primary-button" onclick="startUnmemorizedOnly('${progress}')">未暗記のものだけやる</button>
+                    <button class="action-button secondary-button" onclick="startAllQuestions()">全部やる</button>
+                </div>
+            `;
+            document.getElementById('app-content').innerHTML = html;
+        }
+
+        // 未暗記項目のみ開始
+        function startUnmemorizedOnly(progress) {
+            const unmemorizedPart = progress.substring(4); // "未暗記："を除去
+            questionNumbers = unmemorizedPart.split('/').map(n => parseInt(n)).filter(n => !isNaN(n));
+            totalQuestions = questionNumbers.length;
+            startQuestions();
+        }
+
+        // 全問題開始
+        function startAllQuestions() {
+            questionNumbers = Array.from({length: totalQuestions}, (_, i) => i + 1);
+            startQuestions();
+        }
+
+        // 問題開始
+        function startQuestions() {
+            currentQuestionIndex = 0;
+            if (questionNumbers.length > 0) {
+                currentQuestionNumber = questionNumbers[0];
+                displayQuestion();
+            }
+        }
+
+        // 問題表示
+        function displayQuestion() {
+            if (currentQuestionIndex >= questionNumbers.length) {
+                endQuestions();
+                return;
+            }
+
+            const questionNum = questionNumbers[currentQuestionIndex];
+            const questionData = currentProblemSet[questionNum - 1];
+            
+            if (!questionData || questionData.length < 3) {
+                console.error('問題データが不正です:', questionData);
+                nextQuestion();
+                return;
+            }
+
+            const [, questionContent] = questionData;
+            
+            let questionHtml = '';
+            if (questionContent.includes('/') || questionContent.includes('\\')) {
+                // 画像パスの場合
+                questionHtml = `<img src="${questionContent}" alt="問題画像" class="question-image" onerror="this.alt='画像を読み込めませんでした'">`;
+            } else {
+                // テキストの場合
+                questionHtml = `<div class="question-content">${questionContent}</div>`;
+            }
+
+            const progressPercent = (currentQuestionIndex / questionNumbers.length) * 100;
+
+            const html = `
+                <h2 style="text-align: center; color: #4a5568; margin-bottom: 20px;">${currentSetTitle}</h2>
+                <div class="progress">
+                    <div class="progress-bar" style="width: ${progressPercent}%"></div>
+                </div>
+                <div class="message-row">
+                    <button class="action-button neutral-button" onclick="CancelAndReturn()">メニューへ</button>
+                    <button class="action-button neutral-button" onclick="previousQuestion()">１つ前へ</button>
+                    <div class="message">問題 ${currentQuestionIndex + 1} / ${questionNumbers.length}</div>
+                    <button class="action-button danger-button" onclick="showAnswer()">正解表示</button>
+                    <button class="action-button primary-button" onclick="skipQuestion()">暗記済みにして次へ</button>
+                </div>
+                <div class="question-area">
+                    ${questionHtml}
+                </div>
+            `;
+            
+            document.getElementById('app-content').innerHTML = html;
+        }
+
+        // 答え表示
+        function showAnswer() {
+            const questionNum = questionNumbers[currentQuestionIndex];
+            const questionData = currentProblemSet[questionNum - 1];
+            const [, questionContent, answerContent] = questionData;
+            
+            let questionHtml = '';
+            /*
+            if (questionContent.includes('/') || questionContent.includes('\\')) {
+                questionHtml = `<img src="${questionContent}" alt="問題画像" class="question-image" onerror="this.alt='画像を読み込めませんでした'">`;
+            } else {
+                questionHtml = `<div class="question-content">${questionContent}</div>`;
+            }
+            */
+            let answerHtml = '';
+            if (answerContent.includes('/') || answerContent.includes('\\')) {
+                answerHtml = `<img src="${answerContent}" alt="正解画像" class="answer-image" onerror="this.alt='画像を読み込めませんでした'">`;
+            } else {
+                answerHtml = `<div class="question-content" style="color: #48bb78; font-weight: bold;">${answerContent}</div>`;
+            }
+
+            const progressPercent = (currentQuestionIndex / questionNumbers.length) * 100;
+
+            const html = `
+                <h2 style="text-align: center; color: #4a5568; margin-bottom: 20px;">${currentSetTitle}</h2>
+                <div class="progress">
+                    <div class="progress-bar" style="width: ${progressPercent}%"></div>
+                </div>
+
+                <div class="message-row">
+                    <div class="message">問題 ${currentQuestionIndex + 1} / ${questionNumbers.length}</div>
+                    <button class="action-button danger-button" onclick="markWrong()">未暗記にして次へ</button>
+                    <button class="action-button primary-button" onclick="markCorrect()">暗記済みにして次へ</button>
+                </div>
+
+                <div class="question-area">
+                    <!--
+                    ${questionHtml}
+                    <hr style="margin: 20px 0; border: 1px solid #e2e8f0;">
+                    <div style="color: #48bb78; font-weight: bold; margin-bottom: 10px;">正解:</div>
+                    -->
+                    ${answerHtml}
+                </div>
+            `;
+            
+            document.getElementById('app-content').innerHTML = html;
+        }
+
+        // 正解マーク
+        function markCorrect() {
+            nextQuestion();
+        }
+
+        // 不正解マーク
+        function markWrong() {
+            const questionNum = questionNumbers[currentQuestionIndex];
+            wrongAnswerNumbers.push(questionNum);
+            nextQuestion();
+        }
+
+        // スキップ
+        function skipQuestion() {
+            nextQuestion();
+        }
+
+        // 次の問題
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questionNumbers.length) {
+                displayQuestion();
+            } else {
+                endQuestions();
+            }
+        }
+
+        // 前の問題
+        function previousQuestion() {
+            //alert(currentQuestionIndex);
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        // 問題終了処理
+        function endQuestions() {
+            const wrongCount = wrongAnswerNumbers.length;
+            
+            if (wrongCount === 0) {
+                const html = `
+                    <h2 style="text-align: center; color: #4a5568; margin-bottom: 20px;">${currentSetTitle}</h2>
+                    <div class="message">暗記完了</div>
+                    <div class="button-group">
+                        <button class="action-button primary-button" onclick="completeStudy()">メニューに戻る</button>
+                    </div>
+                `;
+                document.getElementById('app-content').innerHTML = html;
+            } else {
+                const html = `
+                    <h2 style="text-align: center; color: #4a5568; margin-bottom: 20px;">${currentSetTitle}</h2>
+                    <div class="message">未暗記のものが${wrongCount}個、あります。未暗記のものだけもう一度やりますか？</div>
+                    <div class="button-group">
+                        <button class="action-button secondary-button" onclick="retryWrongAnswers()">未暗記のものだけ、もう一度やる</button>
+                        <button class="action-button neutral-button" onclick="saveProgressAndReturn()">メニューに戻る</button>
+                    </div>
+                `;
+                document.getElementById('app-content').innerHTML = html;
+            }
+        }
+
+        // 間違った問題のみ再挑戦
+        function retryWrongAnswers() {
+            questionNumbers = [...wrongAnswerNumbers];
+            totalQuestions = questionNumbers.length;
+            wrongAnswerNumbers = [];
+            currentQuestionIndex = 0;
+            startQuestions();
+        }
+
+        // 学習完了
+        function completeStudy() {
+            const progressKey = `anki_status${currentSetNumber}`;
+            localStorage.setItem(progressKey, '暗記済');
+            loadProblemSetList();
+        }
+
+        // 進捗保存して戻る
+        function saveProgressAndReturn() {
+            if (wrongAnswerNumbers.length > 0) {
+                const progressKey = `anki_status${currentSetNumber}`;
+                const progressValue = '未暗記：' + wrongAnswerNumbers.join('/');
+                localStorage.setItem(progressKey, progressValue);
+            }
+            loadProblemSetList();
+        }
+
+        // 放棄して戻る
+        function CancelAndReturn() {
+            /*
+            if (wrongAnswerNumbers.length > 0) {
+                const progressKey = `anki_status${currentSetNumber}`;
+                const progressValue = '未着手';
+                localStorage.setItem(progressKey, progressValue);
+            }
+            */
+            loadProblemSetList();
+        }
+
+    </script>
+</body>
+</html>
