@@ -551,8 +551,8 @@
                     <button class="navigation-button neutral-button" onclick="navigateToNext()">→</button>
                     <!--<div class="message">${currentQuestionIndex + 1} / ${questionNumbers.length}</div>-->
                     <button class="navigation-button ans-button" onclick="showAnswer()">正解表示</button>
-                    <button class="action-button primary-button" onclick="skipQuestion()">覚えた</button>
-                    <button class="action-button danger-button" onclick="markWrong()">まだ</button>
+                    <button class="action-button primary-button" onclick="skipQuestion()">クリア</button>
+                    <button class="action-button danger-button" onclick="markWrong()">クリアの取消</button>
                 </div>
                 <div class="question-area">
                     ${questionHtml}
@@ -606,8 +606,8 @@
                 <div class="message-row">
                     <!--<div class="message">問題 ${currentQuestionIndex + 1} / ${questionNumbers.length}</div>-->
                     <button class="navigation-button ans-button" onclick="displayQuestion()">戻る</button>
-                    <button class="action-button primary-button" onclick="markCorrect()">覚えた</button>
-                    <button class="action-button danger-button" onclick="markWrong()">まだ</button>
+                    <button class="action-button primary-button" onclick="markCorrect()">クリア</button>
+                    <button class="action-button danger-button" onclick="markWrong()">クリアの取消</button>
                 </div>
 
                 <div class="question-area">
