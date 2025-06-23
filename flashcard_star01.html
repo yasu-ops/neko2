@@ -181,14 +181,14 @@
         }
         
         .action-button {
-            padding: 12px 25px;
-            border: none;
+            padding: 12px 15px;
+            border:1px solid black;
             border-radius: 25px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 1.1em;
             font-weight: bold;
             transition: all 0.3s ease;
-            min-width: 120px;
+            min-width: 50px;
         }
         
         .navigation-button {
@@ -196,7 +196,7 @@
             border: none;
             border-radius: 25px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 1.1em;
             font-weight: bold;
             transition: all 0.3s ease;
             min-width: 50px;
@@ -231,7 +231,36 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        
+
+        .ok-button {
+        background: rgb(195, 240, 199);
+        color: black; /* ベースのテキストカラーは黒 */
+        }
+
+        .ok-button .star-text {
+        color: #38a169; /* 緑色 */
+        font-size: 1.2em;
+        }
+
+        .ok-button .normal-text {
+        color: black;
+        }
+
+        .ng-button {
+        background: white;
+        color: rgb(238, 227, 227); /* ベースのテキストカラーは黒 */
+        }
+
+        .ng-button .star-text {
+        font-size: 1.2em;
+        font-weight:bold;
+        color: red;
+        }
+
+        .ng-button .normal-text {
+        color: black;
+        }
+
         .message {
             text-align: center;
             font-size: 1.2em;
@@ -580,13 +609,19 @@
                 <h2 style="text-align: center; color: #4a5568; margin-bottom: 10px;">${currentSetTitle}</h2>
                 <div class="stars-display current-stars-display" style="text-align: center; margin-bottom: 20px;">${starsHtml}</div>
                 <div class="message-row">
-                    <button class="action-button neutral-button" onclick="CancelAndReturn()">ジャンル一覧</button>
+                    <button class="action-button neutral-button" onclick="CancelAndReturn()">メニュー</button>
                     <button class="navigation-button neutral-button" onclick="previousQuestion()">←</button>
                     <button class="navigation-button neutral-button" onclick="navigateToNext()">→</button>
                     <!--<div class="message">${currentQuestionIndex + 1} / ${questionNumbers.length}</div>-->
-                    <button class="navigation-button ans-button" onclick="showAnswer()">正解表示</button>
-                    <button class="action-button primary-button" onclick="skipQuestion()">クリア</button>
-                    <button class="action-button danger-button" onclick="markWrong()">クリアの取消</button>
+                    <button class="action-button ans-button" onclick="showAnswer()">正解確認</button>
+                    <!--<button class="action-button primary-button" onclick="markCorrect()">わかる</button>-->
+                    <button class="action-button ok-button" onclick="markCorrect()">
+                        <span class="normal-text">覚えた=</span><span class="star-text">★</span>
+                    </button>
+                    <!--<button class="action-button danger-button" onclick="markWrong()">わからない</button>-->
+                    <button class="action-button ng-button" onclick="markWrong()">
+                        <span class="normal-text">覚えてない=</span><span class="star-text">☆</span>
+                    </button>
                 </div>
                 <div class="question-area">
                     ${questionHtml}
@@ -640,8 +675,12 @@
                 <div class="message-row">
                     <!--<div class="message">問題 ${currentQuestionIndex + 1} / ${questionNumbers.length}</div>-->
                     <button class="navigation-button ans-button" onclick="displayQuestion()">戻る</button>
-                    <button class="action-button primary-button" onclick="markCorrect()">クリア</button>
-                    <button class="action-button danger-button" onclick="markWrong()">クリアの取消</button>
+                    <button class="action-button ok-button" onclick="markCorrect()">
+                        <span class="normal-text">覚えた=</span><span class="star-text">★</span>
+                    </button>
+                    <button class="action-button ng-button" onclick="markWrong()">
+                        <span class="normal-text">覚えてない=</span><span class="star-text">☆</span>
+                    </button>
                 </div>
 
                 <div class="question-area">
@@ -655,6 +694,7 @@
         // 正解マーク
         function markCorrect() {
             const questionNum = questionNumbers[currentQuestionIndex];
+            wrongAnswerNumbers = wrongAnswerNumbers.filter(num => num !== questionNum);
             
             // ローカルストレージの進捗を更新
             updateProgressForQuestion(questionNum, true);
@@ -662,7 +702,7 @@
             // 星表示を更新
             updateCurrentStarsDisplay();
             
-            nextQuestion();
+            //nextQuestion();
         }
 
         // 不正解マーク
